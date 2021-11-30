@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class Enemy : GameBehaviour
 {
@@ -15,15 +16,76 @@ public class Enemy : GameBehaviour
     float baseHealth = 50;
     Transform startPos;
     float mySpeed;
-    float myHealth;
-    
+    public float myHealth;
+
+    Animator anim;
+    NavMeshAgent agent;
+    int currentWaypoint;
+    float detectDistance = 10;
+    public float detectTime = 5;
     void Start()
     {
         Setup();
-        startPos = transform;
-        //_EM = FindObjectOfType<EnemyMananger>();
-        moveToPos = _EM.spawnPoint[Random.Range(0, _EM.spawnPoint.Length)];
-        StartCoroutine(Move());
+        anim = GetComponent<Animator>();
+        agent = GetComponent<NavMeshAgent>();
+        SetNav();
+    }
+
+    void SetNav()
+    {
+        currentWaypoint = Random.Range(0, _EM.spawnPoint.Length);
+        agent.SetDestination(_EM.spawnPoint[currentWaypoint].position);
+        ChangeSpeed(mySpeed);
+    }
+
+    void ChangeSpeed(float _speed)
+    {
+        agent.speed = _speed;
+    }
+
+    void Update()
+    {
+        float distToPlayer = Vector3.Distance(transform.position, _P.transform.position);
+
+        if (distToPlayer <=detectDistance)
+        {
+            if (patrolType != PatrolType.Chase)
+            {
+                patrolType = PatrolType.Detect;
+            }
+        }
+
+        switch(patrolType)
+        {
+            case PatrolType.Chase:
+                agent.SetDestination(_P.transform.position);
+                ChangeSpeed(mySpeed * 2);
+                if (distToPlayer > detectDistance)
+                    patrolType = PatrolType.Detect;
+                break;
+            case PatrolType.Detect:
+                agent.SetDestination(transform.position);
+                ChangeSpeed(0);
+                detectTime -= Time.deltaTime;
+                if (distToPlayer <= detectDistance)
+                {
+                    patrolType = PatrolType.Chase;
+                    detectTime = 5;
+                }
+                if (detectTime <= 0)
+                {
+                    patrolType = PatrolType.Patrol;
+                    SetNav();
+                }
+                break;
+            case PatrolType.Patrol:
+                float distToWaypoint = Vector3.Distance(transform.position, _EM.spawnPoint[currentWaypoint].position);
+                if (distToWaypoint < 1)
+                     SetNav();
+                detectTime = 5;
+                break;
+        }
+        anim.SetFloat("Speed", agent.speed);
     }
 
     void Setup()
@@ -45,57 +107,52 @@ public class Enemy : GameBehaviour
         }
     }
 
-    private void Update()
+    public void Hit(int _damage)
     {
-        if (Input.GetKeyDown(KeyCode.H))
-            Hit(20);
-    }
-
-    void Hit(int _damage)
-    {
-        myHealth -= _damage;
+        myHealth -= 20;
         if (myHealth <= 0)
             Die();
         else
+        {
             GameEvent.ReportEnemyHit(gameObject);
+            int rnd = Random.Range(1, 4);
+            anim.SetTrigger("Hit1");
+
+            if (rnd == 1)
+            {
+                anim.SetTrigger("Hit1");
+            }
+            if (rnd == 2)
+            {
+                anim.SetTrigger("Hit2");
+            }
+            if (rnd == 3)
+            {
+                anim.SetTrigger("Hit3");
+            }
+        }
+            
     }
     void Die()
     {
-        GameEvent.ReportEnemyDied(gameObject);
+       // GameEvent.ReportEnemyDied(gameObject);
+        int rnd = Random.Range(1, 4);
+        if (rnd == 1)
+        {
+            anim.SetTrigger("Die1");
+        }
+        if (rnd == 2)
+        {
+            anim.SetTrigger("Die2");
+        }
+        if (rnd == 3)
+        {
+            anim.SetTrigger("Die3");
+        }
     }
 
-    IEnumerator Move()
+    int RandomAnimation()
     {
-        Transform _newPos = transform;
-
-        switch(patrolType)
-        {
-            case PatrolType.Random:
-                _newPos = _EM.spawnPoint[Random.Range(0, _EM.spawnPoint.Length)];
-                break;
-            case PatrolType.Linear:
-                _newPos = _EM.spawnPoint[patrolPoint];
-                patrolPoint = patrolPoint != _EM.spawnPoint.Length ? patrolPoint + 1 : 0;
-                break;
-            case PatrolType.Repeat:
-                _newPos = reverse ? startPos : moveToPos;
-                reverse = !reverse;
-                break;
-        }
-        /*for(int i = 0; i < moveDistance; i++)
-        {
-            transform.Translate(Vector3.forward * Time.deltaTime);
-            yield return null;
-        }*/
-
-        while (Vector3.Distance(transform.position, _newPos.position) > 0.1f)
-        {
-            transform.position = Vector3.MoveTowards(transform.position, _newPos.position, Time.deltaTime * mySpeed);
-            transform.rotation = Quaternion.LookRotation(_newPos.position); // rotation
-            yield return null;
-        }
-        yield return new WaitForSeconds(2);
-
-        StartCoroutine(Move());
+        return Random.Range(1, 4);
     }
 }

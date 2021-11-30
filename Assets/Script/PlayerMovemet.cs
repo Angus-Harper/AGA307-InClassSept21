@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerMovemet : MonoBehaviour
+public class PlayerMovemet : Singleton<PlayerMovemet>
 {
     public CharacterController controller;
 

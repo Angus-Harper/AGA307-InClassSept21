@@ -8,6 +8,7 @@ public class GameBehaviour : MonoBehaviour
     protected static EnemyMananger _EM { get { return EnemyMananger.instance; } }
     protected static UIManager _UI { get { return UIManager.instance; } }
 
+    protected static PlayerMovemet _P { get { return PlayerMovemet.instance; } }
     /// <summary>
     /// Shuffles a list using Unity's Random
     /// </summary>

@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Projecttile
   - Target
+  - Enemy
   layers:
   - Default
   - TransparentFX
