@@ -60,17 +60,19 @@
     <Compile Include="Assets\Script\ProjectTile.cs" />
     <Compile Include="Assets\Script\EnemyMananger.cs" />
     <Compile Include="Assets\Script\Singleton.cs" />
+    <Compile Include="Assets\Script\UIManager.cs" />
     <Compile Include="Assets\Script\FiringPoint.cs" />
     <Compile Include="Assets\Script\Enemy.cs" />
     <Compile Include="Assets\Script\RayCasting.cs" />
+    <Compile Include="Assets\Script\AudioManager.cs" />
     <Compile Include="Assets\Script\GameManager.cs" />
     <Compile Include="Assets\Script\TriggerPad.cs" />
     <Compile Include="Assets\Script\GameEvent.cs" />
     <Compile Include="Assets\Script\MouseLook.cs" />
     <Compile Include="Assets\Script\ChangeItem.cs" />
-    <Compile Include="Assets\Script\GameBehaviour.cs" />
-    <Compile Include="Assets\Script\UIManager.cs" />
     <Compile Include="Assets\Script\UITitle.cs" />
+    <Compile Include="Assets\Script\GameBehaviour.cs" />
+    <Compile Include="Assets\Script\EnemyWeapond.cs" />
   </ItemGroup>
   <ItemGroup>
      <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />

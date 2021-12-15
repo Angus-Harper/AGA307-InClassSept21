@@ -12,7 +12,8 @@ public enum PatrolType
 {
     Patrol,
     Detect,
-    Chase
+    Chase,
+    Attack
 }
 public class EnemyMananger : Singleton<EnemyMananger>
 { 

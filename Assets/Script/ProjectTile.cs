@@ -4,6 +4,11 @@ using UnityEngine;
 
 public class ProjectTile : MonoBehaviour
 {
+    private void Start()
+    {
+        if (GetComponent<AudioSource>() != null)
+            GetComponent<AudioSource>().pitch = Random.Range(0.9f, 1.1f);
+    }
     public int damage = 20;
     void OnCollisionEnter(Collision collision)
     {

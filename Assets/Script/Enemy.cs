@@ -17,6 +17,10 @@ public class Enemy : GameBehaviour
     Transform startPos;
     float mySpeed;
     public float myHealth;
+    bool attacking = false;
+    public float attackDistance = 5.5f;
+    public AudioSource hitSource;
+    public AudioSource footsetpScource;
 
     Animator anim;
     NavMeshAgent agent;
@@ -46,8 +50,11 @@ public class Enemy : GameBehaviour
     void Update()
     {
         float distToPlayer = Vector3.Distance(transform.position, _P.transform.position);
-
-        if (distToPlayer <=detectDistance)
+        if (distToPlayer <= attackDistance)
+        {
+            patrolType = PatrolType.Attack;
+        }
+        else if (distToPlayer <= detectDistance)
         {
             if (patrolType != PatrolType.Chase)
             {
@@ -57,6 +64,11 @@ public class Enemy : GameBehaviour
 
         switch(patrolType)
         {
+            case PatrolType.Attack:
+                agent.SetDestination(_P.transform.position);
+                transform.LookAt(new Vector3(_P.transform.position.x, 0, _P.transform.position.z));
+                Attack();
+                break;
             case PatrolType.Chase:
                 agent.SetDestination(_P.transform.position);
                 ChangeSpeed(mySpeed * 2);
@@ -106,10 +118,23 @@ public class Enemy : GameBehaviour
                 break;
         }
     }
-
+    void Attack()
+    {
+        if (!attacking)
+        {
+            attacking = true;
+            anim.SetTrigger("Attack" + RandomAnimation());
+            StartCoroutine(ResetAttack());
+        }
+    }
+    IEnumerator ResetAttack()
+    {
+        yield return new WaitForSeconds(2);
+        attacking = false;
+    }
     public void Hit(int _damage)
     {
-        myHealth -= 20;
+        myHealth -= _damage;
         if (myHealth <= 0)
             Die();
         else
@@ -117,6 +142,8 @@ public class Enemy : GameBehaviour
             GameEvent.ReportEnemyHit(gameObject);
             int rnd = Random.Range(1, 4);
             anim.SetTrigger("Hit1");
+            hitSource.clip = _AM.GetEnemyHit();
+            hitSource.Play();
 
             if (rnd == 1)
             {
@@ -149,6 +176,13 @@ public class Enemy : GameBehaviour
         {
             anim.SetTrigger("Die3");
         }
+    }
+
+    public void Footstep()
+    {
+        footsetpScource.clip = _AM.footsteps[1];
+        footsetpScource.pitch = Random.Range(0.9f, 1.1f);
+        footsetpScource.Play();
     }
 
     int RandomAnimation()
