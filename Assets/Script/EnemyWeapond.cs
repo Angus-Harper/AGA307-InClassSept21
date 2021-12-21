@@ -11,6 +11,7 @@ public class EnemyWeapond : GameBehaviour
         if (other.CompareTag("Player"))
         {
             _P.Hit(damage);
+            Debug.Log("hit");
         }
     }
 }
